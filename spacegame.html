@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Game</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background: #111;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 400px;
+                width: 600px;
+                color: white;
+                font-family: monospace;
+                overflow: hidden;
+            }
+            #gameWrapper {
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+                display: inline-block;
+                line-height: 0;
+            }
+            canvas {
+                border: 2px solid white;
+                background: #000;
+            }
+            #score {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                font-size: 24px;
+            }
+            #highScore {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                font-size: 16px;
+                color: #aaa;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="score">Score: 0</div>
+        <div id="highScore">Best: 0</div>
+        <div id="gameWrapper">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+
+        <script src="game.js"></script>
+    </body>
+</html>
