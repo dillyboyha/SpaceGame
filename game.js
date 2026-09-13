@@ -69,8 +69,29 @@ document.addEventListener("keyup", (e) => {
 });
 
 function createAsteroid() {
-    const x = Math.random() * (canvas.width - asteroidSize);
-    asteroids.push({ x: x, y: -asteroidSize, width: asteroidSize, height: asteroidSize, age: 0 });
+    const rand = Math.random();
+    let type = "normal";
+    let speed = asteroidSpeed;
+    let color = "#f00";
+    
+    if (rand < 0.15) {
+        type = "hunter";
+        color = "#ff00ff";
+    } else if (rand < 0.3-) {
+        type = "comet";
+        speed = asteroidSpeed * 1.6;
+        color = "#00ffff";
+    }
+    
+    asteroids.push({
+        x: Math.random() * (canvas.width - asteroidSize),
+        y: -asteroidSize,
+        width: asteroidSize,
+        height: asteroidSize,
+        speed: speed,
+        type: type,
+        color: color
+    });
 }
 
 function shatterAsteroid(centerX, centerY) {
@@ -252,6 +273,12 @@ function update() {
 
     if (asteroids.length < maxAsteroids && Math.random() < 0.02) {
         createAsteroid();
+    }
+    
+    // track player as hunter asteroid
+    if (ast.type === "hunter") {
+        if (ast.x < ship.x) ast.x += 1;
+        if (ast.x > ship.x) ast.x -= 1;
     }
 
     // Update & draw shatter particles
