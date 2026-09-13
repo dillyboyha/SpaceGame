@@ -25,6 +25,7 @@ let inMenu = true;
 let asteroidSpeed = 3;
 let hasShield = false;	
 let hasDoubleShot = false;
+let shieldTimer = 0;
 
 highScoreElement.innerText = "Best: " + highScore;
 scoreElement.style.display = "none";
@@ -38,6 +39,7 @@ const ship = {
     color: "#00f",
     speed: 5,
     dx: 0,
+    invincible: false,
 };
 
 let asteroids = [];
@@ -119,6 +121,13 @@ function dropPowerUp(x, y) {
     }
 }
 
+function pickupPowerup() {    
+    hasShield = true;
+    ship.invincible = true;
+    shieldTimer += 240;
+    
+}
+
 function shatterAsteroid(centerX, centerY) {
     const count = 6;
     for (let p = 0; p < count; p++) {
@@ -191,8 +200,35 @@ function update() {
     ship.x += ship.dx;
     if (ship.x < 0) ship.x = 0;
     if (ship.x + ship.width > canvas.width) ship.x = canvas.width - ship.width;
+    
+    if (shieldTimer > 0) {
+        shieldTimer--;
+        if (shieldTimer <= 0) {
+            hasShield = false;
+            ship.invincible = false;
+        }
+    }
 
+    if (ship.invincible) {
+        ctx.globalAlpha = 0.6; 
+    }
     ctx.drawImage(rocketImg, ship.x, ship.y, ship.width, ship.height);
+    ctx.globalAlpha = 1.0;
+
+    if (hasShield) {
+        if (shieldImg.complete && shieldImg.naturalWidth > 0) {
+            const shieldSize = 46; 
+            const shieldX = ship.x + (ship.width / 2) - (shieldSize / 2);
+            const shieldY = ship.y + (ship.height / 2) - (shieldSize / 2);
+            ctx.drawImage(shieldImg, shieldX, shieldY, shieldSize, shieldSize);
+        } else {
+            ctx.strokeStyle = "#00ffff";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(ship.x + ship.width / 2, ship.y + ship.height / 2, 22, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
 
     // Firing
     if (bulletCooldown > 0) bulletCooldown--;
@@ -233,10 +269,12 @@ function update() {
             ship.y < powerup.y + powerup.height &&
             ship.y + ship.height > powerup.y
         ) {
-            hasShield = true; // Activate shield!
+            pickupPowerup()
+            ship.invincible = true;
             powerups.splice(p, 1); // Remove power-up after collection
             continue;
         }
+
         // Draw the power-up safely (falls back to a neon box if image isn't ready)
         if (powerupImg.complete && powerupImg.naturalWidth > 0) {
             ctx.drawImage(powerupImg, powerup.x, powerup.y, powerup.width, powerup.height);
@@ -266,7 +304,16 @@ function update() {
             ship.y < ast.y + ast.height &&
             ship.y + ship.height > ast.y
         ) {
-            endGame();
+            if (!ship.invincible) {
+                endGame();
+            } else {
+                // Optional: destroy the asteroid anyway if you want power-up to smash through them
+                shatterAsteroid(ast.x + ast.width / 2, ast.y + ast.height / 2);
+                asteroids.splice(i, 1);
+                score++;
+                scoreElement.innerText = "Score: " + score;
+                continue;
+            }
         }
 
         let wasShot = false;
