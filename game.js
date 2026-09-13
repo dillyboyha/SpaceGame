@@ -39,11 +39,11 @@ const maxAsteroids = 15;
 
 let bullets = [];
 const bulletSpeed = 8;
-const bulletCooldownFrames = 12; // limits fire rate
+const bulletCooldownFrames = 12; 
 let bulletCooldown = 0;
 
 let particles = [];
-const maxParticles = 80; // safety cap so effects can't pile up and cost too much
+const maxParticles = 80;
 
 let spaceHeld = false;
 
@@ -77,8 +77,7 @@ function createAsteroid() {
     if (rand < 0.15) {
         type = "hunter";
         color = "#ff00ff";
-    }
-    else if (rand < 0.3) {
+    } else if (rand < 0.3) {
         type = "comet";
         speed = asteroidSpeed * 1.6;
         color = "#00ffff";
@@ -91,7 +90,8 @@ function createAsteroid() {
         height: asteroidSize,
         speed: speed,
         type: type,
-        color: color
+        color: color,
+        age: 0 // Added so the trail starts clean
     });
 }
 
@@ -122,7 +122,6 @@ function drawMenu(pulseAlpha) {
     ctx.font = "bold 40px monospace";
     ctx.fillText("SPACE DODGER", canvas.width / 2, 130);
 
-    // Little rocket for flavor
     ctx.drawImage(rocketImg, canvas.width / 2 - 20, 160, 40, 40);
 
     ctx.font = "16px monospace";
@@ -144,7 +143,7 @@ function drawMenu(pulseAlpha) {
 }
 
 function menuLoop(timestamp) {
-    if (!inMenu) return; // stop as soon as the game starts
+    if (!inMenu) return; 
 
     const pulseAlpha = 0.5 + 0.5 * Math.sin(timestamp / 300);
     drawMenu(pulseAlpha);
@@ -194,10 +193,16 @@ function update() {
     for (let i = asteroids.length - 1; i >= 0; i--) {
         const ast = asteroids[i];
 
-        // Age it up (capped) — used to grow the trail in over the first several frames
         ast.age = Math.min(ast.age + 1, 40);
 
-        ast.y += asteroidSpeed;
+        // Move using its individual speed property
+        ast.y += ast.speed;
+
+        // Hunter tracking behavior placed safely inside the loop
+        if (ast.type === "hunter") {
+            if (ast.x < ship.x) ast.x += 1;
+            if (ast.x > ship.x) ast.x -= 1;
+        }
 
         if (
             ship.x < ast.x + ast.width &&
@@ -208,7 +213,6 @@ function update() {
             endGame();
         }
 
-        // Check bullets against this asteroid
         let wasShot = false;
         for (let b = bullets.length - 1; b >= 0; b--) {
             const bullet = bullets[b];
@@ -239,18 +243,17 @@ function update() {
             continue;
         }
 
-        // Draw stardust trail: one rotated, stretched stamp above the asteroid (cheap: 1 draw call)
+        // Draw stardust trail
         if (trailImg.complete && trailImg.naturalWidth > 0) {
-            const trailLength = ast.age * 1.5;        // grows in as the asteroid ages
+            const trailLength = ast.age * 1.5;        
             const trailWidth = ast.width * 1.1;
             const centerX = ast.x + ast.width / 2;
-            const centerY = ast.y - trailLength / 2;   // trail sits above (behind) the asteroid
+            const centerY = ast.y - trailLength / 2;   
 
             ctx.save();
             ctx.globalAlpha = 0.55;
             ctx.translate(centerX, centerY);
-            ctx.rotate(Math.PI / 2); // rotate so the image's long edge points vertically
-            // after rotation, "width" runs along what was the image's height axis
+            ctx.rotate(Math.PI / 2); 
             ctx.drawImage(trailImg, -trailLength / 2, -trailWidth / 2, trailLength, trailWidth);
             ctx.restore();
         }
@@ -275,12 +278,6 @@ function update() {
     if (asteroids.length < maxAsteroids && Math.random() < 0.02) {
         createAsteroid();
     }
-    
-    // track player as hunter asteroid
-    if (ast.type === "hunter") {
-        if (ast.x < ship.x) ast.x += 1;
-        if (ast.x > ship.x) ast.x -= 1;
-    }
 
     // Update & draw shatter particles
     for (let p = particles.length - 1; p >= 0; p--) {
@@ -295,7 +292,7 @@ function update() {
         }
 
         ctx.globalAlpha = particle.life / particle.maxLife;
-        ctx.fillStyle = "#c87850"; // matches the asteroid's rocky tone
+        ctx.fillStyle = "#c87850"; 
         ctx.fillRect(particle.x, particle.y, particle.size, particle.size);
         ctx.globalAlpha = 1;
     }
