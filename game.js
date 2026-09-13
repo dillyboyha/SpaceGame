@@ -16,7 +16,7 @@ const shieldImg = new Image();
 shieldImg.src = "shield.png";
 
 const powerupImg = new Image();
-powerupImg.src = "powerup.png";
+powerupImg.src = "Powerup.png";
 
 let score = 0;
 let highScore = Number(localStorage.getItem("spaceDodgerHighScore")) || 0;
