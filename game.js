@@ -12,11 +12,19 @@ asteroidImg.src = "asteroid.png";
 const trailImg = new Image();
 trailImg.src = "stardust.png";
 
+const shieldImg = new Image();
+shieldImg.src = "shield.png";
+
+const powerupImg = new Image();
+powerupImg.src = "powerup.png";
+
 let score = 0;
 let highScore = Number(localStorage.getItem("spaceDodgerHighScore")) || 0;
 let gameOver = false;
 let inMenu = true;
 let asteroidSpeed = 3;
+let hasShield = false;	
+let hasDoubleShot = false;
 
 highScoreElement.innerText = "Best: " + highScore;
 scoreElement.style.display = "none";
@@ -44,6 +52,9 @@ let bulletCooldown = 0;
 
 let particles = [];
 const maxParticles = 80;
+
+let powerups = [];
+const maxPowerups = 3;
 
 let spaceHeld = false;
 
@@ -95,6 +106,19 @@ function createAsteroid() {
     });
 }
 
+function dropPowerUp(x, y) {
+    const rand = Math.random();
+    if (rand < 0.25) { // 25% chance to drop when an asteroid is shot
+        powerups.push({
+            x: x - 15,
+            y: y,
+            width: 30,
+            height: 30,
+            speed: 2
+        });
+    }
+}
+
 function shatterAsteroid(centerX, centerY) {
     const count = 6;
     for (let p = 0; p < count; p++) {
@@ -111,6 +135,7 @@ function shatterAsteroid(centerX, centerY) {
             maxLife: 20,
         });
     }
+    dropPowerUp(centerX, centerY); // Drop the power-up here!
 }
 
 function drawMenu(pulseAlpha) {
@@ -188,6 +213,33 @@ function update() {
 
         ctx.fillStyle = "#0ff";
         ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+    }
+    
+    // Update & draw power-ups
+    for (let p = powerups.length - 1; p >= 0; p--) {
+        const powerup = powerups[p];
+        powerup.y += powerup.speed; // Move downwards
+
+        // Remove if it goes off the bottom of the screen
+        if (powerup.y > canvas.height) {
+            powerups.splice(p, 1);
+            continue;
+        }
+
+        // Check collision with player ship
+        if (
+            ship.x < powerup.x + powerup.width &&
+            ship.x + ship.width > powerup.x &&
+            ship.y < powerup.y + powerup.height &&
+            ship.y + ship.height > powerup.y
+        ) {
+            hasShield = true; // Activate shield!
+            powerups.splice(p, 1); // Remove power-up after collection
+            continue;
+        }
+
+        // Draw the power-up image
+        ctx.drawImage(powerupImg, powerup.x, powerup.y, powerup.width, powerup.height);
     }
 
     for (let i = asteroids.length - 1; i >= 0; i--) {
