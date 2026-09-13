@@ -77,7 +77,8 @@ function createAsteroid() {
     if (rand < 0.15) {
         type = "hunter";
         color = "#ff00ff";
-    } else if (rand < 0.3) {
+    }
+    else if (rand < 0.3) {
         type = "comet";
         speed = asteroidSpeed * 1.6;
         color = "#00ffff";
