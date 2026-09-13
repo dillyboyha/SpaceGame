@@ -237,9 +237,13 @@ function update() {
             powerups.splice(p, 1); // Remove power-up after collection
             continue;
         }
-
-        // Draw the power-up image
-        ctx.drawImage(powerupImg, powerup.x, powerup.y, powerup.width, powerup.height);
+        // Draw the power-up safely (falls back to a neon box if image isn't ready)
+        if (powerupImg.complete && powerupImg.naturalWidth > 0) {
+            ctx.drawImage(powerupImg, powerup.x, powerup.y, powerup.width, powerup.height);
+        } else {
+            ctx.fillStyle = "#00ffff";
+            ctx.fillRect(powerup.x, powerup.y, powerup.width, powerup.height);
+        }
     }
 
     for (let i = asteroids.length - 1; i >= 0; i--) {
