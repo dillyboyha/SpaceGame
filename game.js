@@ -432,8 +432,9 @@ function endGame() {
     ship.invincible = false;
     
     // remove the remaining powerup orbs / parts
-    powerups[]
+    powerups = [];
     
+    // other cleanup / gui
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
