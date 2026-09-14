@@ -428,12 +428,11 @@ function endGame() {
     shieldTimer = 0;
     doubleShotTimer = 0;
     hasShield = false;
-    hasDoubleShot = 0;
+    hasDoubleShot = false;
     ship.invincible = false;
     
     // remove the remaining powerup orbs / parts
-    const powerup = powerups[p]
-    powerups.splice()
+    powerups[]
     
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
