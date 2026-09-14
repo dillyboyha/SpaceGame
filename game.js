@@ -124,7 +124,7 @@ function dropPowerUp(x, y) {
 
 function pickupPowerup() {  
     const rand = Math.random()
-    if (rand < 0.2) {
+    if (rand < 0.35) {
         hasShield = true;
         ship.invincible = true;
         shieldTimer += 240;
