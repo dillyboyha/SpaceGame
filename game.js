@@ -433,7 +433,7 @@ function endGame() {
     
     // remove the remaining powerup orbs / parts
     const powerup = powerups[p]
-    powerups.splice(p, 1)
+    powerups.splice()
     
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
