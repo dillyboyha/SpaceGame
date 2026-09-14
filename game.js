@@ -26,6 +26,7 @@ let asteroidSpeed = 3;
 let hasShield = false;	
 let hasDoubleShot = false;
 let shieldTimer = 0;
+let doubleShotTimer = 0;
 
 highScoreElement.innerText = "Best: " + highScore;
 scoreElement.style.display = "none";
@@ -121,11 +122,16 @@ function dropPowerUp(x, y) {
     }
 }
 
-function pickupPowerup() {    
-    hasShield = true;
-    ship.invincible = true;
-    shieldTimer += 240;
-    
+function pickupPowerup() {  
+    const rand = Math.random()
+    if (rand < 0.5) {
+        hasShield = true;
+        ship.invincible = true;
+        shieldTimer += 240;
+    } else {
+        hasDoubleShot = true;
+        doubleShotTimer += 120;
+    }    
 }
 
 function shatterAsteroid(centerX, centerY) {
@@ -208,6 +214,13 @@ function update() {
             ship.invincible = false;
         }
     }
+    
+    if (doubleShotTimer > 0) {
+        doubleShotTimer --;
+        if (doubleShotTimer <= 0) {
+            hasDoubleShot = false; 
+        }
+    }
 
     if (ship.invincible) {
         ctx.globalAlpha = 0.6; 
@@ -233,7 +246,12 @@ function update() {
     // Firing
     if (bulletCooldown > 0) bulletCooldown--;
     if (spaceHeld && bulletCooldown === 0) {
-        bullets.push({ x: ship.x + ship.width / 2 - 2, y: ship.y, width: 4, height: 10 });
+        if (hasDoubleShot) {
+            bullets.push({ x: ship.x + 4, y: ship.y, width: 4, height: 10 });
+            bullets.push({ x: ship.x + ship.width - 8, y: ship.y, width: 4, height: 10 });
+        } else {
+            bullets.push({ x: ship.x + ship.width / 2 - 2, y: ship.y, width: 4, height: 10 });
+        }
         bulletCooldown = bulletCooldownFrames;
     }
 
