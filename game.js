@@ -111,7 +111,7 @@ function createAsteroid() {
 
 function dropPowerUp(x, y) {
     const rand = Math.random();
-    if (rand < 0.25) { // 25% chance to drop when an asteroid is shot
+    if (rand < 0.35) { // 25% chance to drop when an asteroid is shot
         powerups.push({
             x: x - 15,
             y: y,
@@ -423,6 +423,14 @@ function update() {
 
 function endGame() {
     gameOver = true;
+    
+    // reset shield timer and double shot timer
+    shieldTimer = 0;
+    doubleShotTimer = 0;
+    hasShield = false;
+    hasDoubleShot = 0;
+    ship.invincible = false;
+    
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
