@@ -130,7 +130,7 @@ function pickupPowerup() {
         shieldTimer += 240;
     } else {
         hasDoubleShot = true;
-        doubleShotTimer += 120;
+        doubleShotTimer += 300;
     }    
 }
 
