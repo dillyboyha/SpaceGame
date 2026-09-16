@@ -24,6 +24,7 @@ powerupImg.src = "Powerup.png";
 
 let score = 0;
 let highScore = Number(localStorage.getItem("spaceDodgerHighScore")) || 0;
+let fps = 0;
 let gameOver = false;
 let inMenu = true;
 let asteroidSpeed = 3;
