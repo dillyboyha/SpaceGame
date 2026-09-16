@@ -2,6 +2,10 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d", { alpha: false });
 const scoreElement = document.getElementById("score");
 const highScoreElement = document.getElementById("highScore");
+const fpsElement = document.getElementById("fpsCounter");
+
+let lastFpsUpdate = 0;
+let frameCount = 0;
 
 const rocketImg = new Image();
 rocketImg.src = "rocket.png";
@@ -31,6 +35,7 @@ let doubleShotTimer = 0;
 highScoreElement.innerText = "Best: " + highScore;
 scoreElement.style.display = "none";
 highScoreElement.style.display = "none";
+fpsElement.innerText = "fps: " + fps
 
 const ship = {
     x: canvas.width / 2 - 15,
@@ -184,6 +189,15 @@ function drawMenu(pulseAlpha) {
 
 function menuLoop(timestamp) {
     if (!inMenu) return; 
+
+    // FPS Calculation
+    frameCount++;
+    if (timestamp - lastFpsUpdate >= 500) {
+        fps = Math.round((frameCount * 1000) / (timestamp - lastFpsUpdate));
+        fpsElement.innerText = "fps: " + fps;
+        frameCount = 0;
+        lastFpsUpdate = timestamp;
+    }
 
     const pulseAlpha = 0.5 + 0.5 * Math.sin(timestamp / 300);
     drawMenu(pulseAlpha);
