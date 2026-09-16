@@ -216,7 +216,18 @@ function update() {
     if (gameOver) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // FPS counter!
+    frameCount++;
+    if (timestamp - lastFpsUpdate >= 500) {
+        fps = Math.round((frameCount * 1000) / (timestamp - lastFpsUpdate));
+        fpsElement.innerText = "fps: " + fps;
+        frameCount = 0;
+        lastFpsUpdate = timestamp;
+    }
 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);    
+    
     ship.x += ship.dx;
     if (ship.x < 0) ship.x = 0;
     if (ship.x + ship.width > canvas.width) ship.x = canvas.width - ship.width;
