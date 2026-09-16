@@ -56,7 +56,7 @@ const maxAsteroids = 15;
 
 let bullets = [];
 const bulletSpeed = 8;
-const bulletCooldownFrames = 12; 
+const bulletCooldownFrames = 12;	
 let bulletCooldown = 0;
 
 let particles = [];
@@ -111,13 +111,13 @@ function createAsteroid() {
         speed: speed,
         type: type,
         color: color,
-        age: 0 // Added so the trail starts clean
+        age: 0
     });
 }
 
 function dropPowerUp(x, y) {
     const rand = Math.random();
-    if (rand < 0.50) { // 50% chance to drop when an asteroid is shot
+    if (rand < 0.50) {
         powerups.push({
             x: x - 15,
             y: y,
@@ -156,7 +156,7 @@ function shatterAsteroid(centerX, centerY) {
             maxLife: 20,
         });
     }
-    dropPowerUp(centerX, centerY); // Drop the power-up here!
+    dropPowerUp(centerX, centerY);
 }
 
 function drawMenu(pulseAlpha) {
@@ -191,7 +191,6 @@ function drawMenu(pulseAlpha) {
 function menuLoop(timestamp) {
     if (!inMenu) return; 
 
-    // FPS Calculation
     frameCount++;
     if (timestamp - lastFpsUpdate >= 500) {
         fps = Math.round((frameCount * 1000) / (timestamp - lastFpsUpdate));
@@ -213,12 +212,9 @@ function startGame() {
     restartGame();
 }
 
-function update() {
+function update(timestamp) {
     if (gameOver) return;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // FPS counter!
     frameCount++;
     if (timestamp - lastFpsUpdate >= 500) {
         fps = Math.round((frameCount * 1000) / (timestamp - lastFpsUpdate));
@@ -227,7 +223,7 @@ function update() {
         lastFpsUpdate = timestamp;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     ship.x += ship.dx;
     if (ship.x < 0) ship.x = 0;
@@ -298,15 +294,13 @@ function update() {
     // Update & draw power-ups
     for (let p = powerups.length - 1; p >= 0; p--) {
         const powerup = powerups[p];
-        powerup.y += powerup.speed; // Move downwards
+        powerup.y += powerup.speed;
 
-        // Remove if it goes off the bottom of the screen
         if (powerup.y > canvas.height) {
             powerups.splice(p, 1);
             continue;
         }
 
-        // Check collision with player ship
         if (
             ship.x < powerup.x + powerup.width &&
             ship.x + ship.width > powerup.x &&
@@ -315,11 +309,10 @@ function update() {
         ) {
             pickupPowerup()
             ship.invincible = true;
-            powerups.splice(p, 1); // Remove power-up after collection
+            powerups.splice(p, 1);
             continue;
         }
 
-        // Draw the power-up safely (falls back to a neon box if image isn't ready)
         if (powerupImg.complete && powerupImg.naturalWidth > 0) {
             ctx.drawImage(powerupImg, powerup.x, powerup.y, powerup.width, powerup.height);
         } else {
@@ -332,11 +325,8 @@ function update() {
         const ast = asteroids[i];
 
         ast.age = Math.min(ast.age + 1, 40);
-
-        // Move using its individual speed property
         ast.y += ast.speed;
 
-        // Hunter tracking behavior placed safely inside the loop
         if (ast.type === "hunter") {
             if (ast.x < ship.x) ast.x += 1;
             if (ast.x > ship.x) ast.x -= 1;
@@ -351,7 +341,6 @@ function update() {
             if (!ship.invincible) {
                 endGame();
             } else {
-                // Optional: destroy the asteroid anyway if you want power-up to smash through them
                 shatterAsteroid(ast.x + ast.width / 2, ast.y + ast.height / 2);
                 asteroids.splice(i, 1);
                 score++;
@@ -390,7 +379,6 @@ function update() {
             continue;
         }
 
-        // Draw stardust trail
         if (trailImg.complete && trailImg.naturalWidth > 0) {
             const trailLength = ast.age * 1.5;        
             const trailWidth = ast.width * 1.1;
@@ -450,17 +438,14 @@ function update() {
 function endGame() {
     gameOver = true;
     
-    // reset shield timer and double shot timer
     shieldTimer = 0;
     doubleShotTimer = 0;
     hasShield = false;
     hasDoubleShot = false;
     ship.invincible = false;
     
-    // remove the remaining powerup orbs / parts
     powerups = [];
     
-    // other cleanup / gui
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "white";
@@ -481,7 +466,7 @@ function restartGame() {
     asteroidSpeed = 3;
     ship.x = canvas.width / 2 - ship.width / 2;
     scoreElement.innerText = "Score: " + score;
-    update();
+    requestAnimationFrame(update);
 }
 
 requestAnimationFrame(menuLoop);
